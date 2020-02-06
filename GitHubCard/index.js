@@ -47,33 +47,57 @@ axios.get('https://api.github.com/users/nisaChampagne')
           user, and adding that card to the DOM.
 */
 
-const followersArray = [
-  "MarquesJ8023",
-  "justsml",
-  "bigknell",
-  "Luis1D",
-  "adkhiker",
-  "dorabelme",
-  "pdadlani",
-  "brudnak"
-];
+// const followersArray = [
+//   "MarquesJ8023",
+//   "justsml",
+//   "bigknell",
+//   "Luis1D",
+//   "adkhiker",
+//   "dorabelme",
+//   "pdadlani",
+//   "brudnak"
+// ];
 
-const followersAxios = ()=> {
-  axios.get("https://api.github.com/users/nisaChampagne/followers")
-    .then(res=> {
-      console.log(res.data, 'FOLLOWERS!')
-    })
-}
+// followersArray.forEach(follow=> {
+//   axios.get(`https://api.github.com/users/${follow}`)
+//     .then(res => {
+//       // console.log(res.data, 'look!')
+//       const cardsChild = document.querySelector('.cards')
+//       const data = gitHubCard(res.data)
+//       cardsChild.append(data)
+//     })
+// })
 
-followersArray.forEach(follow=> {
-  axios.get(`https://api.github.com/users/${follow}`)
-    .then(res => {
-      // console.log(res.data, 'look!')
-      const cardsChild = document.querySelector('.cards')
-      const data = gitHubCard(res.data)
-      cardsChild.append(data)
+
+let followersArray = []
+const follows =  axios.get("https://api.github.com/users/nisaChampagne/followers")
+
+follows
+  .then( res=> {
+    const data = res.data
+    followersArray = data.map(user => {
+      return user.login
     })
+
+    followersArray.forEach(user => {
+      axios.get(`https://api.github.com/users/${user}`)
+        .then(res=> {
+          const data = res.data
+          let followersData = gitHubCard(data)
+          const cardChild = document.querySelector(".cards")
+          cardChild.append(followersData)
+        })
+        .catch(error => {
+          console.log(`Check out this error: ${error}`)
+        })
+    })
+
+    return followersArray;
 })
+  .catch(err => {
+    return console.log(`Check out this error: ${err}.`)
+})
+
 
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:
@@ -137,10 +161,3 @@ function gitHubCard(userObject){
   return card
 }
 
-/* List of LS Instructors Github username's: 
-  tetondan
-  dustinmyers
-  justsml
-  luishrd
-  bigknell
-*/
